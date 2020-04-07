@@ -7,7 +7,7 @@ from Crypto.Util.Padding import pad, unpad
 from Crypto import Random
 import random, os, struct, base64
 
-MASTER_KEY_ARN = 'arn:aws:kms:us-east-1:486652066693:key/44d25f19-fda9-48ed-88d8-4c8afd0e837b'
+MASTER_KEY_ARN = 'INSERT YOUR KMS MASTER KEY ARN HERE'
 S3_BUCKET = 'public-sst'
 DIRECTORY = '/Users/stormacq/Desktop'
 FILENAME  = 'wifi.jpg'
