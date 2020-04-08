@@ -272,10 +272,44 @@ def kmsSign():
     else:
         print('Signature is NOT valid')
 
+def kmsAsyncEncrypt():
+
+    # small amount of data only 
+    # see https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kms.html#KMS.Client.encrypt
+    MESSAGE_TO_CRYPT = b'This is the message to encrypt'
+    ASYNC_KEY_ARN    = 'arn:aws:kms:us-east-1:486652066693:key/5a681bd7-d1f9-44f7-839f-576601255490'
+
+    #
+    # Create a KMS Client object
+    #
+    session = Session(profile_name="default", region_name="us-east-1")
+    kms = session.client('kms')
+
+    #
+    # Cipher a plain text object using your master key
+    #
+    ret = kms.encrypt(
+        KeyId=ASYNC_KEY_ARN,
+        Plaintext=MESSAGE_TO_CRYPT,
+        EncryptionAlgorithm='RSAES_OAEP_SHA_256'
+    )
+    print (f"Ciphered text     = {base64.b64encode(ret['CiphertextBlob'])}")
+
+    #
+    # Decrypt a ciphered text
+    #
+    ret = kms.decrypt(
+        KeyId=ASYNC_KEY_ARN,
+        CiphertextBlob=ret['CiphertextBlob'],
+        EncryptionAlgorithm='RSAES_OAEP_SHA_256'
+    )
+    print (f"Plaintext message = {ret['Plaintext']}")
+
 
 if __name__ == '__main__':
     # kmsKeyDemo()
     # kmsEncryptionDemo()
     # S3KMSDemo()
     # encryptionSDKDemo()
-    kmsSign()
+    # kmsSign()
+    kmsAsyncEncrypt()
