@@ -7,7 +7,7 @@ from Crypto.Util.Padding import pad, unpad
 from Crypto import Random
 import random, os, struct, base64
 
-MASTER_KEY_ARN = 'INSERT YOUR KMS MASTER KEY ARN HERE'
+MASTER_KEY_ARN = 'arn:aws:kms:us-east-1:486652066693:key/44d25f19-fda9-48ed-88d8-4c8afd0e837b'
 S3_BUCKET = 'public-sst'
 DIRECTORY = '/Users/stormacq/Desktop'
 FILENAME  = 'wifi.jpg'
@@ -82,7 +82,7 @@ def kmsEncryptionDemo():
     # Decrypt a ciphered text
     #
     ret = kms.decrypt(CiphertextBlob=ret['CiphertextBlob'])
-    print ("Plaintext password = %s" % ret['Plaintext'])
+    print (f"Plaintext password = {ret['Plaintext']}")
 
 
 #file encryption code taken from http://eli.thegreenplace.net/2010/06/25/aes-encryption-of-files-in-python-with-pycrypto/
@@ -200,28 +200,82 @@ def S3KMSDemo():
 def encryptionSDKDemo():
     import aws_encryption_sdk
 
+    #
     # AWS Encryption SDK works with arbitrary length text 
+    #
     plaintext = 'This is a very long text document'
 
+    #
     # The MKP object contains reference to master keys
+    #
     mkp = aws_encryption_sdk.KMSMasterKeyProvider(key_ids=[MASTER_KEY_ARN])
     encryption_context = {"data_type": "example", "classification": "public"}
 
+    #
     # Let's encrypt the plaintext data
+    #
     ciphertext, encryptor_header = aws_encryption_sdk.encrypt(
         source=plaintext, key_provider=mkp, encryption_context=encryption_context
     )
 
+    #
     # Let's decrypt the ciphertext data
+    #
     decrypted_plaintext, decryptor_header = aws_encryption_sdk.decrypt(
         source=ciphertext, key_provider=mkp
     )
 
     print(decrypted_plaintext.decode("utf-8"))
 
+def kmsSign():
+
+    MESSAGE_TO_SIGN = b'This is the message to sign'
+    SIGNATURE_KEY_ARN = 'arn:aws:kms:us-east-1:486652066693:key/c74eed44-ecb6-424b-9b1e-1a305ab64a4e'
+
+    #
+    # Create a KMS Client object
+    #
+    session = Session(profile_name="default", region_name="us-east-1")
+    kms = session.client('kms')
+
+    #
+    # Sign a piece of text 
+    #
+    print('Signing a simple text ')
+    response = kms.sign(
+        KeyId=SIGNATURE_KEY_ARN,
+        Message=MESSAGE_TO_SIGN,
+        MessageType='RAW',
+        SigningAlgorithm='RSASSA_PSS_SHA_256'
+    )
+
+    signature = response['Signature']
+
+    #
+    # Show signature 
+    #
+    print(f"Signature : {base64.b64encode(signature).decode('ascii')}")
+
+    #
+    # verify signature 
+    #
+    response = kms.verify(
+        KeyId=SIGNATURE_KEY_ARN,
+        Message=MESSAGE_TO_SIGN,
+        MessageType='RAW',
+        Signature=signature,
+        SigningAlgorithm='RSASSA_PSS_SHA_256'
+    )
+
+    if response['SignatureValid'] == True:
+        print('Signature is valid')
+    else:
+        print('Signature is NOT valid')
+
 
 if __name__ == '__main__':
-    kmsKeyDemo()
-    kmsEncryptionDemo()
-    S3KMSDemo()
-    encryptionSDKDemo()
+    # kmsKeyDemo()
+    # kmsEncryptionDemo()
+    # S3KMSDemo()
+    # encryptionSDKDemo()
+    kmsSign()
