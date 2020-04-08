@@ -288,6 +288,7 @@ def kmsAsyncEncrypt():
     #
     # Cipher a plain text object using your master key
     #
+    print('Use public key to encrypt a short text')
     ret = kms.encrypt(
         KeyId=ASYNC_KEY_ARN,
         Plaintext=MESSAGE_TO_CRYPT,
@@ -298,6 +299,7 @@ def kmsAsyncEncrypt():
     #
     # Decrypt a ciphered text
     #
+    print('Use private key to decrypt a short text')
     ret = kms.decrypt(
         KeyId=ASYNC_KEY_ARN,
         CiphertextBlob=ret['CiphertextBlob'],
@@ -311,5 +313,5 @@ if __name__ == '__main__':
     # kmsEncryptionDemo()
     # S3KMSDemo()
     # encryptionSDKDemo()
-    # kmsSign()
+    kmsSign()
     kmsAsyncEncrypt()
