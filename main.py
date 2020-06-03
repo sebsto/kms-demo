@@ -13,12 +13,12 @@ DIRECTORY = '/Users/stormacq/Desktop'
 FILENAME  = 'wifi.jpg'
 
 def kmsKeyDemo():
-    print("\nHello KMS Key Demo\n")
+    print('\nHello KMS Key Demo\n')
 
     #
     # Create a KMS Client object
     #
-    session = Session(profile_name="default", region_name="us-east-1")
+    session = Session(profile_name='default', region_name='us-east-1')
     kms = session.client('kms')
 
     #
@@ -57,26 +57,26 @@ def kmsKeyDemo():
     obj = AES.new(keyPlain, AES.MODE_CBC, b'This is an IV123')
     plainText = unpad(obj.decrypt(msgCipher), 16)
 
-    print ('Plain text msg = %s' % plainText)
+    print (f'Plain text msg = {plainText}')
 
 def kmsEncryptionDemo():
 
-    print ("\nHello KMS Password encryption Demo\n")
+    print ('\nHello KMS Password encryption Demo\n')
 
     #
     # Create a KMS Client object
     #
-    session = Session(profile_name="default", region_name="us-east-1")
+    session = Session(profile_name='default', region_name='us-east-1')
     kms = session.client('kms')
 
-    password = "this is my super secret password"
-    print("Plaintext password  = %s" % password)
+    password = 'this is my super secret password'
+    print(f'Plaintext password  = {password}')
 
     #
     # Cipher a plain text object using your master key
     #
     ret = kms.encrypt(KeyId=MASTER_KEY_ARN,Plaintext=password)
-    print ("Cipher password    = %s" % base64.b64encode(ret['CiphertextBlob']))
+    print (f"Cipher password    = {base64.b64encode(ret['CiphertextBlob'])}")
 
     #
     # Decrypt a ciphered text
@@ -91,7 +91,7 @@ def S3KMSDemo():
     #
     # Create a KMS Client object
     #
-    session = Session(profile_name="default", region_name="us-east-1")
+    session = Session(profile_name='default', region_name='us-east-1')
     kms = session.client('kms')
 
     #
@@ -104,19 +104,19 @@ def S3KMSDemo():
     #
     # Encode a file with the data key
     #
-    print ("Initializing encryption engine")
+    print ('Initializing encryption engine')
     iv = Random.new().read(AES.block_size)
     chunksize = 64*1024
     encryptor = AES.new(keyPlain, AES.MODE_CBC, iv)
 
-    print ("KMS Plain text key = %s " % base64.b64encode(keyPlain))
-    print ("KMS Encrypted key  = %s " % base64.b64encode(keyCipher))
+    print (f'KMS Plain text key = {base64.b64encode(keyPlain)} ')
+    print (f'KMS Encrypted key  = {base64.b64encode(keyCipher)} ')
 
     in_filename = os.path.join(DIRECTORY, FILENAME)
     out_filename = in_filename + '.enc'
     filesize = os.path.getsize(in_filename)
 
-    print ("Encrypting file")
+    print ('Encrypting file')
     with open(in_filename, 'rb') as infile:
         with open(out_filename, 'wb') as outfile:
             outfile.write(struct.pack('<Q', filesize))
@@ -133,9 +133,9 @@ def S3KMSDemo():
     # Store encrypted file on S3
     # Encrypted Key will be stored as meta data
     #
-    print ("Storing encrypted file on S3")
+    print ('Storing encrypted file on S3')
     metadata = {
-        "key" : base64.b64encode(keyCipher).decode('ascii')
+        'key' : base64.b64encode(keyCipher).decode('ascii')
     }
 
     s3 = session.client('s3')
@@ -149,7 +149,7 @@ def S3KMSDemo():
     #
     # Download Encrypted File and it's metadata
     #
-    print ("Download file and meta data from S3")
+    print ('Download file and meta data from S3')
     transfer = S3Transfer(s3)
     transfer.download_file(S3_BUCKET, out_filename, out_filename)
 
@@ -162,16 +162,16 @@ def S3KMSDemo():
     keyCipher = base64.b64decode(object.metadata['key'])
 
     #decrypt encrypted key
-    print ("Decrypt ciphered key")
+    print ('Decrypt ciphered key')
     key = kms.decrypt(CiphertextBlob=keyCipher)
     keyPlain = key['Plaintext']
-    print ("KMS Plain text key = %s " % base64.b64encode(keyPlain))
-    print ("KMS Encrypted key  = %s " % base64.b64encode(keyCipher))
+    print (f'KMS Plain text key = {base64.b64encode(keyPlain)}')
+    print (f'KMS Encrypted key  = {base64.b64encode(keyCipher)}')
 
     #
     # Decrypt the file
     #
-    print("Decrypt the file")
+    print('Decrypt the file')
 
     in_filename = out_filename
     out_filename = in_filename + '.jpg'
@@ -193,7 +193,7 @@ def S3KMSDemo():
     # Cleanup S3
     object.delete()
 
-    print ("Done.\n\nYour file %s should be identical to original file %s" % (out_filename, os.path.join(DIRECTORY, FILENAME)))
+    print (f'Done.\n\nYour file {out_filename} should be identical to original file {os.path.join(DIRECTORY, FILENAME)}')
 
 # from https://github.com/aws/aws-encryption-sdk-python
 # see http://busy-engineers-guide.reinvent-workshop.com/ 
@@ -209,7 +209,7 @@ def encryptionSDKDemo():
     # The MKP object contains reference to master keys
     #
     mkp = aws_encryption_sdk.KMSMasterKeyProvider(key_ids=[MASTER_KEY_ARN])
-    encryption_context = {"data_type": "example", "classification": "public"}
+    encryption_context = {'data_type': 'example', 'classification': 'public'}
 
     #
     # Let's encrypt the plaintext data
@@ -225,7 +225,7 @@ def encryptionSDKDemo():
         source=ciphertext, key_provider=mkp
     )
 
-    print(decrypted_plaintext.decode("utf-8"))
+    print(decrypted_plaintext.decode('utf-8'))
 
 def kmsSign():
 
@@ -235,7 +235,7 @@ def kmsSign():
     #
     # Create a KMS Client object
     #
-    session = Session(profile_name="default", region_name="us-east-1")
+    session = Session(profile_name='default', region_name='us-east-1')
     kms = session.client('kms')
 
     #
@@ -272,7 +272,7 @@ def kmsSign():
     else:
         print('Signature is NOT valid')
 
-def kmsAsyncEncrypt():
+def kmsAsymetricEncrypt():
 
     # small amount of data only 
     # see https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/kms.html#KMS.Client.encrypt
@@ -282,7 +282,7 @@ def kmsAsyncEncrypt():
     #
     # Create a KMS Client object
     #
-    session = Session(profile_name="default", region_name="us-east-1")
+    session = Session(profile_name='default', region_name='us-east-1')
     kms = session.client('kms')
 
     #
@@ -309,9 +309,9 @@ def kmsAsyncEncrypt():
 
 
 if __name__ == '__main__':
-    # kmsKeyDemo()
-    # kmsEncryptionDemo()
-    # S3KMSDemo()
-    # encryptionSDKDemo()
+    kmsKeyDemo()
+    kmsEncryptionDemo()
+    S3KMSDemo()
+    encryptionSDKDemo()
     kmsSign()
-    kmsAsyncEncrypt()
+    kmsAsymetricEncrypt()
