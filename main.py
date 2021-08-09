@@ -32,7 +32,8 @@ def kmsKeyDemo():
     #
     # Encode a plain text with the data key
     #
-    obj = AES.new(keyPlain, AES.MODE_CBC, b'This is an IV123')
+    iv = Random.new().read(AES.block_size) 
+    obj = AES.new(keyPlain, AES.MODE_CBC, iv)
     msgPlain  = b'Hello world of cryptography w/managed keys'
     msgCipher = obj.encrypt(pad(msgPlain, 16))
 
@@ -54,7 +55,7 @@ def kmsKeyDemo():
     #
     # and we decrypt our cipher text
     #
-    obj = AES.new(keyPlain, AES.MODE_CBC, b'This is an IV123')
+    obj = AES.new(keyPlain, AES.MODE_CBC, iv)
     plainText = unpad(obj.decrypt(msgCipher), 16)
 
     print (f'Plain text msg = {plainText}')
